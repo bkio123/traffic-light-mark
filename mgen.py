@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import cv2
 import torch
+import sys
 
 class cs_light_mark(torch.nn.Module):
 
@@ -10,13 +11,19 @@ class cs_light_mark(torch.nn.Module):
     def light_check(self, img):
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
+        rtn, img = cv2.threshold(img,200,255,cv2.THRESH_BINARY)
 
-        print(img.shape, type(img))
+        # print(img.shape, type(img))
 
         height = img.shape[0]
         width = img.shape[1]
 
         total = img.sum()
+        ration_total =  (total / (width * height * 255)) * 100
+        if ration_total < 2: # under 2% area
+            return 3
+
+        print(f'total = {total}, ration toral = {ration_total}')
 
         sum = img.sum(axis=0)
         print(sum.shape)
@@ -38,26 +45,21 @@ class cs_light_mark(torch.nn.Module):
 
         rlist = [r1,r2,r3]
 
-        for i, v in enumerate(rlist):
-            if v > 0.4:
-                return i
-        return 4
+        max_val = max(rlist)
+        index = rlist.index(max_val)
+
+        return index
+
 
     def forward(self, x):
         out = self.light_check(x)
         return out
 
+
 if __name__ == "__main__" : 
 
-    img = cv2.imread('imgs/02.jpg')
     model = cs_light_mark()
+    print(model)
 
-    out = model(img)
-    print(out)
-
-    # torch.save(model,'model.pt')
-
-    # print('return value {:03}'.format(val))
-    # plt.imshow(cv2.cvtColor(img,cv2.COLOR_BGR2RGB))
-    # plt.show()
+    torch.save(model,'model.pt')
 

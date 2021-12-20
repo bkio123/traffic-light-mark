@@ -50,6 +50,7 @@ class cs_light_mark(torch.nn.Module):
 
         return index
 
+
     def forward(self, x):
         out = self.light_check(x)
         return out
@@ -57,17 +58,24 @@ class cs_light_mark(torch.nn.Module):
 
 if __name__ == "__main__" : 
 
-    
+    # if len(sys.argv) > 1 :
+    #     file = sys.argv[1]
+    # else: 
+    #     file = 'imgs/01.jpg'
+
     file = ('imgs/01.jpg' if len(sys.argv) < 2 else sys.argv[1])
     print(f'file = {file}')
 
     img = cv2.imread(file)
     model= torch.load('model.pt')
-    model.eval
     print(model)
 
     out = model(img)
     print(out)
 
+    # val = light_check(img)
+    # print('return value {:03}'.format(val))
+    # plt.imshow(cv2.cvtColor(img,cv2.COLOR_BGR2RGB))
+    # plt.show()
 
 
